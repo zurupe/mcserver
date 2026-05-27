@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    container_name: mcserver-app
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      DB_PATH: /app/data/database.sqlite
+    volumes:
+      - mcserver-data:/app/data
+
+volumes:
+  mcserver-data:
