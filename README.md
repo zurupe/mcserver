@@ -1,81 +1,94 @@
-# MC Servers — Panel de Estado en Vivo
+🇪🇸 [Leer en Español](README-es.md)
 
-¡Bienvenido a **MC Servers**! Este es un proyecto completo (Frontend + Backend) diseñado para que cualquier persona pueda administrar y mostrar el estado de sus servidores de Minecraft en internet de forma elegante y segura.
+# MC Servers — Live Status Panel
 
-## 🚀 Características Principales
+Welcome to **MC Servers**! This is a complete project (Frontend + Backend) designed so anyone can manage and display the status of their Minecraft servers on the internet in a comfortable and simple way.
 
-- **Panel Público:** Muestra tus servidores de Minecraft (Java y Bedrock) con su estado en vivo, MOTD limpio, icono y número de jugadores conectados.
-- **Panel de Administración:** Un dashboard protegido por contraseña para añadir, editar o eliminar servidores fácilmente.
-- **Servidores Privados:** Posibilidad de ocultar la IP de un servidor detrás de una contraseña. ¡Ideal para servidores entre amigos!
-- **Base de Datos Integrada:** Utiliza SQLite para almacenar la información, sin necesidad de configurar motores de bases de datos pesados.
-- **Listo para Docker:** Todo el proyecto (Frontend en React/Vite y Backend en Express) está empaquetado en un entorno Docker multistage, listo para subir y desplegar en un solo comando.
+## 🚀 Key Features
 
-## 🐳 Despliegue con Docker (Recomendado)
+- **Public Panel:** Display your Minecraft servers (Java and Bedrock) with their live status, clean MOTD, icon, and online player count.
+- **Admin Dashboard:** A password-protected dashboard to easily add, edit, or remove servers.
+- **Private Servers:** Ability to hide a server's IP behind a password. Perfect for servers among friends!
+- **Built-in Database:** Uses SQLite to store information, no need to configure heavy database engines.
+- **Docker Ready:** The entire project (React/Vite Frontend and Express Backend) is Dockerized and ready to use via the image uploaded to my Docker Hub. Links are specified further down in this document.
 
-La forma más fácil de desplegar este proyecto es utilizando Docker. 
+## 🐳 Deployment with Docker
 
-### 1. Descargar la imagen
-Puedes descargar la imagen preconstruida desde Docker Hub usando la cuenta `zurupe`:
+The easiest way to deploy this project is using Docker Compose.
+
+### 1. Download the image
+You can download the pre-built image from my Docker Hub profile:
 ```bash
-docker pull zurupe/mis-servidores:latest
+docker pull zurupe/mcservers:latest
 ```
 
-### 2. Ejecutar con Docker Compose
-Crea un archivo `docker-compose.yml` en tu servidor con el siguiente contenido:
+### 2. Run with Docker Compose
+Create a `docker-compose.yml` file on your server with the following content:
 
 ```yaml
 services:
   app:
-    image: zurupe/mis-servidores:latest
+    image: zurupe/mcservers:latest
     container_name: mcserver-app
     restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
-      # Credenciales para el Panel de Administración
-      ADMIN_USERNAME: tu_usuario_seguro
-      ADMIN_PASSWORD: tu_password_seguro
-      # Secreto para JWT (Cámbialo por una cadena aleatoria larga)
-      JWT_SECRET: mi_secreto_super_seguro_123
-      # Ruta de la base de datos dentro del contenedor
+      # Credentials for the Admin Dashboard
+      ADMIN_USERNAME: your_secure_username
+      ADMIN_PASSWORD: your_secure_password
+      # Secret for JWT (Change this to a long random string)
+      JWT_SECRET: my_super_secure_secret_123
+      # Database path inside the container
       DB_PATH: /app/data/database.sqlite
     volumes:
-      # Volumen para persistir los servidores si el contenedor se reinicia
+      # Volume to persist servers if the container restarts
       - mcserver-data:/app/data
 
 volumes:
   mcserver-data:
 ```
 
-Luego, simplemente ejecuta:
+Then, simply run:
 ```bash
 docker compose up -d
 ```
-Tu aplicación estará disponible en `http://tu-ip:3001`.
+Your application will be available at `http://localhost:3001`.
 
-## 🛠️ Desarrollo Local
+## 🛠️ Local Development
 
-Si prefieres ejecutarlo o modificarlo localmente sin Docker:
+If you prefer to run or modify it locally, you can clone the repository and run it without Docker:
 
-1. **Instala las dependencias:**
+1. **Install dependencies:**
    ```bash
    npm install
    ```
-2. **Inicia el servidor Backend:**
+2. **Start the Backend server:**
    ```bash
    node server/index.js
    ```
-3. **Inicia el servidor Frontend (en otra terminal):**
+3. **Start the Frontend server (in another terminal):**
    ```bash
    npm run dev
    ```
 
-*Nota: Por defecto, el usuario y contraseña de administración local son `admin` / `admin`.*
+*Note: By default, the local admin username and password are `admin` / `admin`.*
 
-## 🔒 Seguridad
-- **Protección JWT:** La API está protegida mediante tokens.
-- **Encriptación:** Las contraseñas (tanto de acceso al panel como contraseñas para desbloquear IPs de servidores privados) están hasheadas utilizando `bcrypt`.
-- **Salud del contenedor:** Incluye un endpoint `/api/health` para el monitoreo de Docker.
+## 🔒 Security
+- **JWT Protection:** The API is protected using tokens.
+- **Encryption:** Passwords (both for panel access and to unlock private server IPs) are hashed using `bcrypt`.
+- **Container Health:** Includes a `/api/health` endpoint for Docker monitoring.
 
 ---
-*Desarrollado para la comunidad de Minecraft.*
+## 📝 License and Commercial Use
+
+This project is distributed under the **PolyForm Noncommercial License 1.0.0**. You can check the [LICENSE](LICENSE) file for more details.
+
+**This project is free to use for personal servers, communities, and non-profit purposes.**
+
+For commercial uses, integration into hosting companies, resale, or any form of direct monetization of the software, please contact me to acquire a commercial license.
+
+---
+*Developed for the Minecraft community.*
+
+**Att: ZhuruServices https://zurupe.github.io/LandingPage/**
