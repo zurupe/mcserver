@@ -2,8 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #0f172a; /* Fondo oscuro moderno */
-  color: #ffffff;
+@layer base {
+  body {
+    @apply bg-obsidian-950 text-ash-100 font-sans antialiased overflow-x-hidden;
+  }
+
+  ::selection {
+    @apply bg-forge-500/30 text-white;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-obsidian-950;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-obsidian-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-obsidian-600;
+  }
 }
-
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-md bg-obsidian-900/60 border border-obsidian-700/50;
+  }
+
+  .glow-forge {
+    @apply shadow-[0_8px_32px_rgba(192,110,59,0.08)];
+  }
+
+  .dot-pattern {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}

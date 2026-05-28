@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ServerCard from './components/ServerCard';
@@ -43,48 +44,70 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 selection:bg-indigo-500 selection:text-white relative">
+    <div className="min-h-screen bg-radial-forge dot-pattern flex flex-col items-center justify-center p-4 relative">
       {view === 'home' && (
         <button 
           onClick={() => setView(token ? 'admin' : 'login')}
-          className="absolute top-4 right-4 text-slate-700 hover:text-indigo-400 transition-colors p-2"
+          className="absolute top-4 right-4 text-obsidian-400 hover:text-forge-400 border border-transparent hover:border-obsidian-700 hover:bg-obsidian-900 hover:shadow-[0_0_15px_rgba(192,110,59,0.2)] rounded-full transition-all p-3"
           title="Acceso Administrativo"
         >
           <Lock size={20} />
         </button>
       )}
 
-      {view === 'login' && (
-        <div className="w-full flex justify-center flex-grow items-center">
-          <Login onLogin={handleLogin} onCancel={() => setView('home')} />
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {view === 'login' && (
+          <motion.div 
+            key="login"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="w-full flex justify-center flex-grow items-center"
+          >
+            <Login onLogin={handleLogin} onCancel={() => setView('home')} />
+          </motion.div>
+        )}
 
-      {view === 'admin' && (
-        <div className="w-full flex justify-center flex-grow items-center">
-          <AdminDashboard 
-            token={token} 
-            onLogout={handleLogout} 
-            servers={servers}
-            onServerAdded={(newServer) => setServers([...servers, newServer])}
-            onServerUpdated={(updatedServer) => setServers(servers.map(s => s.id === updatedServer.id ? updatedServer : s))}
-            onServerDeleted={(deletedId) => setServers(servers.filter(s => s.id !== deletedId))}
-          />
-        </div>
-      )}
+        {view === 'admin' && (
+          <motion.div 
+            key="admin"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="w-full flex justify-center flex-grow items-center"
+          >
+            <AdminDashboard 
+              token={token} 
+              onLogout={handleLogout} 
+              servers={servers}
+              onServerAdded={(newServer) => setServers([...servers, newServer])}
+              onServerUpdated={(updatedServer) => setServers(servers.map(s => s.id === updatedServer.id ? updatedServer : s))}
+              onServerDeleted={(deletedId) => setServers(servers.filter(s => s.id !== deletedId))}
+            />
+          </motion.div>
+        )}
 
-      {view === 'home' && (
-        <>
-          <div className="text-center mb-12 mt-8">
-            <h1 className="text-5xl font-black text-white mb-2 tracking-tight">
+        {view === 'home' && (
+          <motion.div 
+            key="home"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full flex flex-col items-center flex-grow"
+          >
+          <div className="text-center mb-14 mt-12 relative">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-3 tracking-tighter">
               MIS SERVIDORES
             </h1>
-            <div className="h-1 w-24 bg-indigo-500 mx-auto rounded-full"></div>
+            <div className="h-1.5 w-32 bg-gradient-to-r from-forge-600 via-forge-400 to-transparent mx-auto rounded-l-full"></div>
+            <p className="text-obsidian-400 text-sm tracking-[0.2em] uppercase mt-4 font-medium">
+              Estado en tiempo real
+            </p>
           </div>
 
           {loading ? (
-            <div className="text-slate-400 flex items-center gap-2">
-              <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="text-obsidian-300 flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-forge-500 border-t-transparent rounded-full animate-spin"></div>
               Cargando servidores de la red...
             </div>
           ) : (
@@ -106,11 +129,13 @@ function App() {
               )}
             </div>
           )}
-        </>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       
-      <footer className="mt-16 text-slate-700 text-xs uppercase font-bold tracking-widest">
-        Zhuru Mc_Servers v3.0 {view === 'home' && '| Sistema en Vivo'}
+      <div className="w-full max-w-lg h-px bg-gradient-to-r from-transparent via-obsidian-700/50 to-transparent mt-16 mb-6"></div>
+      <footer className="text-obsidian-400 text-xs uppercase font-bold tracking-[0.3em] hover:text-obsidian-300 transition-colors pb-4">
+        Zhuru Mc_Servers v3.0 {view === 'home' && <span className="text-forge-500/80">|</span>} {view === 'home' && 'Sistema en Vivo'}
       </footer>
     </div>
   );

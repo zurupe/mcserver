@@ -99,13 +99,14 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-700 hover:border-indigo-500 transition-all duration-300 max-w-md w-full flex flex-col"
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      className="glass rounded-xl p-6 hover:glow-forge transition-all duration-300 max-w-md w-full flex flex-col hover:border-forge-500/40"
     >
       <div className="flex items-center gap-4 mb-4">
         {/* Icono */}
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0 border border-slate-600 relative">
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-obsidian-900 flex-shrink-0 border border-obsidian-700 relative">
           {loading ? (
-            <div className="w-full h-full animate-pulse bg-slate-700" />
+            <div className="w-full h-full animate-pulse bg-obsidian-800" />
           ) : (
             <img
               // Esta API devuelve el icono directamente en base64 si existe, si no ponemos uno por defecto
@@ -117,39 +118,39 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
           )}
           {/* Si falla la imagen principal, mostramos un backup detrás */}
           {!loading && !serverData?.icon && (
-            <div className="absolute inset-0 flex items-center justify-center text-slate-600 font-bold bg-slate-900">MC</div>
+            <div className="absolute inset-0 flex items-center justify-center text-obsidian-600 font-bold bg-obsidian-900">MC</div>
           )}
         </div>
 
         <div>
-          <h2 className="text-xl font-bold text-white">{name}</h2>
+          <h2 className="text-xl font-bold text-ash-100">{name}</h2>
           <div className="flex items-center gap-2 mt-1">
-            <span className={`w-2 h-2 rounded-full ${serverData?.online ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}`}></span>
-            <span className="text-sm text-slate-400 font-medium">
+            <span className={`w-2 h-2 rounded-full ${serverData?.online ? 'bg-ember-500 animate-pulse-glow' : 'bg-obsidian-600'}`}></span>
+            <span className="text-sm text-obsidian-400 font-medium">
               {loading ? "Ping..." : serverData?.online ? "En línea" : "Desconectado"}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="bg-slate-900/30 p-3 rounded-lg mb-4 flex-grow border border-slate-700/50">
-        <p className="text-slate-300 text-sm leading-relaxed italic">
-          "{getDescription()}"
+      <div className="mb-4 flex-grow border-l-2 border-forge-500/50 pl-3 py-1">
+        <p className="text-obsidian-300 text-sm leading-relaxed">
+          {getDescription()}
         </p>
       </div>
 
-      <div className="flex items-center justify-between bg-slate-900 p-3 rounded-lg mb-4">
-        <div className="flex items-center gap-2 text-slate-400">
-          {isLocked && !unlocked ? <Lock size={16} className="text-slate-400" /> : <Wifi size={16} />}
-          <span className={`text-xs font-mono truncate max-w-[150px] ${isLocked && !unlocked ? 'text-slate-400 font-bold' : ''}`}>
+      <div className="flex items-center justify-between bg-obsidian-950/50 p-3 rounded-lg mb-4 border border-obsidian-800/50">
+        <div className="flex items-center gap-2 text-obsidian-400">
+          {isLocked && !unlocked ? <Lock size={16} className="text-obsidian-400" /> : <Wifi size={16} />}
+          <span className={`text-xs font-mono truncate max-w-[150px] ${isLocked && !unlocked ? 'text-obsidian-400 font-bold' : ''}`}>
             {displayIp}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-indigo-400 font-semibold">
+        <div className="flex items-center gap-2 text-forge-400 font-semibold">
           <Users size={16} />
           {/* Adaptado para la estructura de mcstatus.io */}
           <span>{serverData?.players?.online || 0}</span>
-          <span className="text-slate-500 text-xs font-normal">/ {serverData?.players?.max || 20}</span>
+          <span className="text-obsidian-600 text-xs font-normal">/ {serverData?.players?.max || 20}</span>
         </div>
       </div>
 
@@ -157,7 +158,7 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
         <form onSubmit={handlePasswordSubmit} className="flex gap-2">
           <div className="relative flex-grow">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <KeyRound size={16} className={passwordError ? "text-red-400" : "text-slate-500"} />
+              <KeyRound size={16} className={passwordError ? "text-ember-500" : "text-obsidian-400"} />
             </div>
             <input 
               type="password" 
@@ -165,14 +166,14 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
               value={passwordInput}
               onChange={(e) => setPasswordInput(e.target.value)}
               placeholder="Contraseña..."
-              className={`w-full bg-slate-900 text-white text-sm rounded-lg block pl-9 p-3 outline-none border transition-colors ${
-                passwordError ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-700 focus:border-indigo-500'
+              className={`w-full bg-obsidian-900 text-ash-100 text-sm rounded-lg block pl-9 p-3 outline-none border transition-colors ${
+                passwordError ? 'border-ember-500 ring-1 ring-ember-500' : 'border-obsidian-700 focus:border-forge-500'
               }`}
             />
           </div>
           <button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-lg transition-all"
+            className="bg-gradient-to-r from-forge-600 to-forge-500 hover:brightness-110 text-white font-bold px-4 rounded-lg transition-all shadow-[0_0_15px_rgba(192,110,59,0.2)]"
           >
             Ver
           </button>
@@ -180,15 +181,15 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
       ) : (
         <button
           onClick={handleCopy}
-          className={`w-full py-3 px-4 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md ${
+          className={`w-full py-3 px-4 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-md group ${
             copied 
-              ? 'bg-green-600 text-white translate-y-0.5' 
+              ? 'bg-[#4ade80] text-obsidian-950 scale-95' 
               : (isLocked && !unlocked)
-                ? 'bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-600/50 hover:border-slate-500/50 hover:-translate-y-0.5'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:-translate-y-0.5'
+                ? 'bg-transparent hover:bg-obsidian-800 text-ash-100 border border-obsidian-700 hover:border-obsidian-600 hover:-translate-y-0.5'
+                : 'bg-gradient-to-r from-forge-600 to-forge-500 text-white hover:shadow-[0_0_15px_rgba(192,110,59,0.4)] hover:-translate-y-0.5 hover:brightness-110'
           }`}
         >
-          {copied ? <Check size={18} /> : (isLocked && !unlocked ? <Lock size={18} /> : <Copy size={18} />)}
+          {copied ? <Check size={18} /> : (isLocked && !unlocked ? <Lock size={18} className="transition-transform group-hover:rotate-12" /> : <Copy size={18} />)}
           {copied ? "¡COPIADO!" : (isLocked && !unlocked ? "DESBLOQUEAR IP" : "COPIAR IP")}
         </button>
       )}
