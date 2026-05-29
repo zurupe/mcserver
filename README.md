@@ -17,7 +17,11 @@ Welcome to **MC Servers**! This is a complete project (Frontend + Backend) desig
 The easiest way to deploy this project is using Docker Compose.
 
 ### 1. Download the image
-You can download the pre-built image from my Docker Hub profile:
+You can download the stable pre-built image from my Docker Hub profile:
+```bash
+docker pull zurupe/mcservers:v2
+```
+or the latest one:
 ```bash
 docker pull zurupe/mcservers:latest
 ```
@@ -28,7 +32,7 @@ Create a `docker-compose.yml` file on your server with the following content:
 ```yaml
 services:
   app:
-    image: zurupe/mcservers:latest
+    image: zurupe/mcservers:v2
     container_name: mcserver-app
     restart: unless-stopped
     ports:

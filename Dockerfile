@@ -4,6 +4,10 @@
 # Stage 1: Build the React frontend (Vite)
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Install build tools needed by better-sqlite3 (node-gyp)
+RUN apk add --no-cache python3 make g++
+
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . ./
@@ -14,13 +18,16 @@ FROM node:20-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 
+# Install build tools needed by better-sqlite3 (node-gyp)
+RUN apk add --no-cache python3 make g++
+
 # Copy only the necessary parts from builder
 COPY --from=builder /app/server ./server
 COPY --from=builder /app/dist ./dist
 COPY package.json package-lock.json ./
 
-# Install only production dependencies (backend)
-RUN npm ci --omit=dev
+# Install only production dependencies (backend) and clean up build tools
+RUN npm ci --omit=dev && apk del python3 make g++
 
 # Environment variables (override at runtime via docker run -e or docker-compose)
 ENV ADMIN_USERNAME=admin \

@@ -16,11 +16,14 @@
 La forma más fácil de desplegar este proyecto es utilizando DockerCompose. 
 
 ### 1. Descargar la imagen
-Puedes descargar la imagen preconstruida desde mi perfil en Docker Hub:
+Puedes descargar la imagen  más estable preconstruida desde mi perfil en Docker Hub:
+```bash
+docker pull zurupe/mcservers:v2
+```
+o la más reciente:
 ```bash
 docker pull zurupe/mcservers:latest
 ```
-
 
 ### 2. Ejecutar con Docker Compose
 Crea un archivo `docker-compose.yml` en tu servidor con el siguiente contenido:
@@ -28,7 +31,7 @@ Crea un archivo `docker-compose.yml` en tu servidor con el siguiente contenido:
 ```yaml
 services:
   app:
-    image: zurupe/mcservers:latest
+    image: zurupe/mcservers:v2
     container_name: mcserver-app
     restart: unless-stopped
     ports:
