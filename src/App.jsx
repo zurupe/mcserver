@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ServerCard from './components/ServerCard';

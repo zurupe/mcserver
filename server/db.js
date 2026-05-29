@@ -30,8 +30,8 @@ db.exec(`
 `);
 
 // Safe migrations for new columns
-try { db.exec("ALTER TABLE servers ADD COLUMN isLocked INTEGER DEFAULT 0;"); } catch (e) { }
-try { db.exec("ALTER TABLE servers ADD COLUMN lockPassword TEXT;"); } catch (e) { }
+try { db.exec("ALTER TABLE servers ADD COLUMN isLocked INTEGER DEFAULT 0;"); } catch (_e) { /* ignore */ }
+try { db.exec("ALTER TABLE servers ADD COLUMN lockPassword TEXT;"); } catch (_e) { /* ignore */ }
 
 // Create a default admin user if none exists
 const checkUsers = db.prepare('SELECT count(*) as count FROM users').get();

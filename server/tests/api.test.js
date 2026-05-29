@@ -1,6 +1,5 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
 
 // ── Dynamically import the Express app ──────────────────────────────
 // We set environment variables BEFORE importing so the server uses a
@@ -11,10 +10,10 @@ process.env.JWT_SECRET     = 'ci_test_secret';
 process.env.DB_PATH        = ':memory:'; // Won't persist anything
 
 // Helper: make HTTP requests to the test server
-const request = (server, method, path, body = null, headers = {}) => {
+const request = (server, method, _path, body = null, headers = {}) => {
   return new Promise((resolve, reject) => {
     const addr = server.address();
-    const url = `http://127.0.0.1:${addr.port}${path}`;
+    const url = `http://127.0.0.1:${addr.port}${_path}`;
 
     const options = {
       method,
@@ -36,13 +35,11 @@ const request = (server, method, path, body = null, headers = {}) => {
 // ── Test suite ──────────────────────────────────────────────────────
 describe('MC Servers API', () => {
   let server;
-  let app;
   let adminToken;
 
   before(async () => {
     // Import app after env vars are set
-    const mod = await import('../index.js');
-    app = mod.default || mod.app;
+    await import('../index.js');
 
     // If the module doesn't export the app, we need to create our own server
     // The current index.js calls app.listen() directly, so we need a workaround.
@@ -52,7 +49,6 @@ describe('MC Servers API', () => {
     const bcrypt = (await import('bcrypt')).default;
     const jwt = (await import('jsonwebtoken')).default;
     const db = (await import('../db.js')).default;
-    const path = (await import('path')).default;
 
     const testApp = express();
     testApp.use(cors());
@@ -73,7 +69,7 @@ describe('MC Servers API', () => {
           try {
             jwt.verify(token, process.env.JWT_SECRET);
             isAdmin = true;
-          } catch (e) { /* public */ }
+          } catch (_e) { /* public */ }
         }
         const servers = db.prepare('SELECT * FROM servers').all();
         if (isAdmin) {
@@ -85,7 +81,7 @@ describe('MC Servers API', () => {
           });
           res.json(masked);
         }
-      } catch (error) {
+      } catch (_error) {
         res.status(500).json({ error: 'Failed to fetch servers' });
       }
     });
@@ -103,7 +99,7 @@ describe('MC Servers API', () => {
         if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
         const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
         res.json({ token });
-      } catch (error) {
+      } catch (_error) {
         res.status(500).json({ error: 'Server error' });
       }
     });
@@ -120,7 +116,7 @@ describe('MC Servers API', () => {
         const response = await fetch(apiUrl);
         const data = await response.json();
         res.json(data);
-      } catch (error) {
+      } catch (_error) {
         res.status(500).json({ error: 'Failed to fetch status' });
       }
     });
@@ -130,7 +126,14 @@ describe('MC Servers API', () => {
   });
 
   after(() => {
-    server?.close();
+    if (server) {
+      server.closeAllConnections();
+      server.close(() => {
+        setTimeout(() => process.exit(0), 100);
+      });
+    } else {
+      process.exit(0);
+    }
   });
 
   // ── Health ────────────────────────────────────────────────────────
