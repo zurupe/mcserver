@@ -78,7 +78,7 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
         setPasswordError(true);
         setTimeout(() => setPasswordError(false), 1000);
       }
-    } catch (err) {
+    } catch (_err) {
       setPasswordError(true);
       setTimeout(() => setPasswordError(false), 1000);
     }

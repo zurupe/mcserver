@@ -56,7 +56,7 @@ const AdminDashboard = ({ token, onLogout, servers, onServerAdded, onServerUpdat
         const data = await response.json();
         setStatus({ type: 'error', message: data.error || 'Error al eliminar' });
       }
-    } catch (err) {
+    } catch (_err) {
       setStatus({ type: 'error', message: 'Error de conexión al servidor' });
     }
   };
@@ -96,7 +96,7 @@ const AdminDashboard = ({ token, onLogout, servers, onServerAdded, onServerUpdat
         if (response.status === 401 || response.status === 403) onLogout();
         setStatus({ type: 'error', message: data.error || 'Error al guardar' });
       }
-    } catch (err) {
+    } catch (_err) {
       setStatus({ type: 'error', message: 'Error de conexión al servidor' });
     } finally {
       setLoading(false);

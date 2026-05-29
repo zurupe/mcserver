@@ -31,7 +31,7 @@ app.get('/api/servers', (req, res) => {
       try {
         jwt.verify(token, JWT_SECRET);
         isAdmin = true;
-      } catch (e) {
+      } catch (_e) {
         // invalid token, treat as public
       }
     }
@@ -49,7 +49,7 @@ app.get('/api/servers', (req, res) => {
       });
       res.json(maskedServers);
     }
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to fetch servers' });
   }
 });
@@ -74,7 +74,7 @@ app.post('/api/login', (req, res) => {
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -113,7 +113,7 @@ app.post('/api/servers', authenticateToken, (req, res) => {
     
     const newServer = db.prepare('SELECT * FROM servers WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(newServer);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to add server' });
   }
 });
@@ -143,7 +143,7 @@ app.put('/api/servers/:id', authenticateToken, (req, res) => {
 
     const updatedServer = db.prepare('SELECT * FROM servers WHERE id = ?').get(id);
     res.json(updatedServer);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to update server' });
   }
 });
@@ -160,7 +160,7 @@ app.delete('/api/servers/:id', authenticateToken, (req, res) => {
     }
 
     res.json({ message: 'Server deleted successfully' });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to delete server' });
   }
 });
@@ -178,7 +178,7 @@ app.get('/api/status/:id', async (req, res) => {
     const response = await fetch(apiUrl);
     const data = await response.json();
     res.json(data);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to fetch status' });
   }
 });
@@ -198,7 +198,7 @@ app.post('/api/servers/:id/unlock', (req, res) => {
     } else {
       res.status(401).json({ error: 'Incorrect password' });
     }
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Server error' });
   }
 });

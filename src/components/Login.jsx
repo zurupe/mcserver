@@ -27,7 +27,7 @@ const Login = ({ onLogin, onCancel }) => {
       } else {
         setError(data.error || 'Credenciales inválidas');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Error de conexión al servidor');
     } finally {
       setLoading(false);
