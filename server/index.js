@@ -39,7 +39,12 @@ app.get('/api/servers', (req, res) => {
     const servers = db.prepare('SELECT * FROM servers').all();
     
     if (isAdmin) {
-      res.json(servers);
+      // Redact lockPassword hash even for admin to preserve confidentiality (defense-in-depth)
+      const sanitized = servers.map(server => ({
+        ...server,
+        lockPassword: null
+      }));
+      res.json(sanitized);
     } else {
       const maskedServers = servers.map(server => {
         if (server.isLocked === 1) {
@@ -55,9 +60,9 @@ app.get('/api/servers', (req, res) => {
 });
 
 app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password } = req.body || {};
   
-  if (!username || !password) {
+  if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
@@ -94,16 +99,16 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.post('/api/servers', authenticateToken, (req, res) => {
-  const { name, ip, fallbackDesc, isBedrock, isLocked, lockPassword } = req.body;
+  const { name, ip, fallbackDesc, isBedrock, isLocked, lockPassword } = req.body || {};
   
-  if (!name || !ip) {
+  if (!name || !ip || typeof name !== 'string' || typeof ip !== 'string') {
     return res.status(400).json({ error: 'Name and IP are required' });
   }
 
   try {
     // Hash the lock password if provided
     let hashedLockPassword = null;
-    if (isLocked && lockPassword) {
+    if (isLocked && lockPassword && typeof lockPassword === 'string') {
       const salt = bcrypt.genSaltSync(10);
       hashedLockPassword = bcrypt.hashSync(lockPassword, salt);
     }
@@ -112,7 +117,7 @@ app.post('/api/servers', authenticateToken, (req, res) => {
     const result = insert.run(name, ip, fallbackDesc || '', isBedrock ? 1 : 0, isLocked ? 1 : 0, hashedLockPassword);
     
     const newServer = db.prepare('SELECT * FROM servers WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(newServer);
+    res.status(201).json({ ...newServer, lockPassword: null });
   } catch (_error) {
     res.status(500).json({ error: 'Failed to add server' });
   }
@@ -120,18 +125,26 @@ app.post('/api/servers', authenticateToken, (req, res) => {
 
 app.put('/api/servers/:id', authenticateToken, (req, res) => {
   const { id } = req.params;
-  const { name, ip, fallbackDesc, isBedrock, isLocked, lockPassword } = req.body;
+  const { name, ip, fallbackDesc, isBedrock, isLocked, lockPassword } = req.body || {};
   
-  if (!name || !ip) {
+  if (!name || !ip || typeof name !== 'string' || typeof ip !== 'string') {
     return res.status(400).json({ error: 'Name and IP are required' });
   }
 
   try {
-    // Hash the lock password if provided
-    let hashedLockPassword = null;
-    if (isLocked && lockPassword) {
-      const salt = bcrypt.genSaltSync(10);
-      hashedLockPassword = bcrypt.hashSync(lockPassword, salt);
+    const existing = db.prepare('SELECT lockPassword FROM servers WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Server not found' });
+    }
+
+    let hashedLockPassword = existing.lockPassword;
+    if (isLocked) {
+      if (lockPassword && typeof lockPassword === 'string') {
+        const salt = bcrypt.genSaltSync(10);
+        hashedLockPassword = bcrypt.hashSync(lockPassword, salt);
+      }
+    } else {
+      hashedLockPassword = null;
     }
 
     const update = db.prepare('UPDATE servers SET name = ?, ip = ?, fallbackDesc = ?, isBedrock = ?, isLocked = ?, lockPassword = ? WHERE id = ?');
@@ -142,7 +155,7 @@ app.put('/api/servers/:id', authenticateToken, (req, res) => {
     }
 
     const updatedServer = db.prepare('SELECT * FROM servers WHERE id = ?').get(id);
-    res.json(updatedServer);
+    res.json({ ...updatedServer, lockPassword: null });
   } catch (_error) {
     res.status(500).json({ error: 'Failed to update server' });
   }
@@ -185,13 +198,21 @@ app.get('/api/status/:id', async (req, res) => {
 
 app.post('/api/servers/:id/unlock', (req, res) => {
   const { id } = req.params;
-  const { password } = req.body;
+  const { password } = req.body || {};
   
+  if (!password || typeof password !== 'string') {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
   try {
     const server = db.prepare('SELECT ip, lockPassword, isLocked FROM servers WHERE id = ?').get(id);
     if (!server) return res.status(404).json({ error: 'Server not found' });
     if (server.isLocked !== 1) return res.json({ ip: server.ip });
     
+    if (!server.lockPassword) {
+      return res.status(403).json({ error: 'Server lock password is not configured' });
+    }
+
     const isValid = bcrypt.compareSync(password, server.lockPassword);
     if (isValid) {
       res.json({ ip: server.ip });
@@ -211,6 +232,18 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export app for testing and external consumers
+export { app };
+export default app;
+
+// Start server when run as entry point or non-test mode
+const isMain = process.argv[1] && (
+  process.argv[1] === fileURLToPath(import.meta.url) ||
+  process.argv[1].endsWith('/server/index.js')
+);
+
+if (isMain || process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

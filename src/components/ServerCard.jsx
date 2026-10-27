@@ -38,7 +38,7 @@ const ServerCard = ({ id, name, ip, fallbackDesc, isBedrock = false, isLocked = 
           setServerData(data);
           setLoading(false);
         })
-        .catch((err) => {
+        .catch((_err) => {
           setError(true);
           setLoading(false);
         });

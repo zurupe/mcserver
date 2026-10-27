@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test server/tests/api.test.js"
+    "test": "node --test \"server/tests/*.test.js\"",
+    "test:api": "node --test server/tests/api.test.js",
+    "test:security": "node --test server/tests/security.test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
